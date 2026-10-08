@@ -1,0 +1,4 @@
+import { Role } from "@/generated/prisma/client";import { requireUser } from "@/lib/auth";import { errorResponse } from "@/lib/http";import { createTicketSchema } from "@/lib/validation";import { PrismaTicketRepository } from "@/repositories/ticket-repository";import { createTicket } from "@/services/ticket-service";
+const repository=new PrismaTicketRepository();
+export async function GET(){try{const user=await requireUser();const all=user.role===Role.ADMIN||user.role===Role.TECHNICIAN;return Response.json({tickets:await repository.list(user.id,all)})}catch(error){return errorResponse(error)}}
+export async function POST(request:Request){try{const user=await requireUser();const input=createTicketSchema.parse(await request.json());return Response.json({ticket:await createTicket(repository,input,user.id)},{status:201})}catch(error){return errorResponse(error)}}

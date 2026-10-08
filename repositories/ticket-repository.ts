@@ -1,0 +1,4 @@
+import "server-only";
+import { db } from "@/lib/db";
+import type { TicketInput,TicketRepository } from "@/types/domain";
+export class PrismaTicketRepository implements TicketRepository{async nextNumber(){const latest=await db.ticket.findFirst({orderBy:{createdAt:"desc"},select:{number:true}});const next=latest?Number(latest.number.split("-")[1])+1:1001;return `INC-${next}`}async assetExists(id:string){return(await db.asset.count({where:{id,status:{not:"RETIRED"}}}))===1}async create(input:TicketInput&{number:string;reporterId:string}){return db.ticket.create({data:input,select:{id:true,number:true}})}async list(userId:string,canViewAll:boolean){return db.ticket.findMany({where:canViewAll?{}:{reporterId:userId},include:{reporter:{select:{name:true}},assignee:{select:{name:true}},asset:{select:{assetTag:true}}},orderBy:[{priority:"desc"},{createdAt:"desc"}],take:100})}}

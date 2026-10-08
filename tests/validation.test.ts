@@ -1,0 +1,2 @@
+import { describe,expect,it } from "vitest";import { createTicketSchema } from "@/lib/validation";
+describe("ticket validation",()=>{it("accepts a complete request",()=>expect(createTicketSchema.safeParse({title:"VPN cannot connect",description:"Connection fails with gateway unavailable",priority:"HIGH"}).success).toBe(true));it("rejects empty descriptions",()=>expect(createTicketSchema.safeParse({title:"VPN issue",description:"short",priority:"HIGH"}).success).toBe(false))});
